@@ -1,0 +1,39 @@
+name: Python LSA Flask App CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest  # GitHub runner to run the CI on Ubuntu
+
+    steps:
+    # Step 1: Check out the repository to access your project files
+    - uses: actions/checkout@v3
+
+    # Step 2: Set up Python 3.x environment
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    # Step 3: Install dependencies using the makefile
+    - name: Install dependencies
+      run: make install
+
+    # Step 4: Run the application on localhost:3000
+    - name: Run application
+      run: |
+        make run &  # Run your Flask app
+        sleep 10    # Wait for the server to fully start
+
+    # Step 5: Test if the application is running on the correct port (localhost:3000)
+    - name: Test application is running
+      run: |
+        curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3000
